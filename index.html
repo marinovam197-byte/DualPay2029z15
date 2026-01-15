@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>DualPay Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Montserrat&display=swap" rel="stylesheet">
+</head>
+<body class="bg-sky-50 font-montserrat text-gray-800 flex flex-col h-screen">
+
+<header class="bg-teal-600 text-white p-4 text-center shadow-lg">
+    <h1 class="text-xl font-comfortaa">DualPay Calculator</h1>
+</header>
+
+<main class="flex-1 p-6 space-y-5">
+    <!-- amount to pay -->
+    <div>
+        <label class="block text-sm font-medium">Дължима сума:</label>
+        <div class="mt-1 flex rounded-lg overflow-hidden shadow">
+            <input type="number" step="0.01" id="amount" placeholder="0.00" class="w-full px-4 py-2 outline-none bg-white">
+            <select id="currency" class="bg-gray-100 px-4 py-2">
+                <option>лв</option>
+                <option>€</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- payments -->
+    <div class="space-y-3">
+        <label>Платено в лв:</label>
+        <input type="number" step="0.01" id="paidBGN" placeholder="0.00" class="w-full p-3 rounded border">
+    </div>
+
+    <div class="space-y-3">
+        <label>Платено в €:</label>
+        <input type="number" step="0.01" id="paidEUR" placeholder="0.00" class="w-full p-3 rounded border">
+    </div>
+
+    <!-- result -->
+    <div id="result" class="mt-6 p-4 rounded-lg bg-white hidden shadow">
+        <div class="flex justify-between text-lg">
+            <span>Ресто:</span>
+            <span id="restAmount">—</span>
+        </div>
+        <div class="text-sm text-gray-500 mt-1" id="restCurrency">—</div>
+    </div>
+
+    <div id="error" class="hidden text-red-600 text-center py-2 rounded font-bold animate-pulse">
+        Платено е недостатъчно!
+    </div>
+
+    <button id="toggle" class="mt-4 bg-teal-600 text-white px-6 py-2 rounded-full shadow hover:bg-teal-700">
+        Превключи ресто на лв
+    </button>
+</main>
+
+<footer class="text-xs text-center p-3 text-gray-500 bg-white border-t">
+    Курс: 1 EUR = one point nine five five eight three BGN © Leo
+</footer>
+
+<script>
+    const rate = 1.95583;
+    const toggle = document.getElementById("toggle");
+    const result = document.getElementById("result");
+    let restInEuro = true;
+
+    function update() {
+        const amount = parseFloat(document.getElementById("amount").value) || 0;
+        const currency = document.getElementById("currency").value;
+        const base = currency === "лв" ? amount : amount * rate;
+
+        const paidBGN = parseFloat(document.getElementById("paidBGN").value) || 0;
+        const paidEUR = parseFloat(document.getElementById("paidEUR").value) || 0;
+        const totalPaid = paidBGN + paidEUR * rate;
+
+        const rest = totalPaid - base;
+        const error = document.getElementById("error");
+
+        if (rest < 0) {
+            error.classList.remove("hidden");
+            result.classList.add("hidden");
+            return;
+        }
+        error.classList.add("hidden");
+
+        const restDisplay = restInEuro ? rest / rate : rest;
+        document.getElementById("restAmount").textContent = restDisplay.toFixed(2);
+        document.getElementById("restCurrency").textContent = restInEuro ? 
+            `€ (${(rest).toFixed(2)} лв)` : 
+            `лв (${(rest / rate).toFixed(2)} €)`;
+
+        result.classList.remove("hidden");
+    }
+
+    document.querySelectorAll('input').forEach(el => el.addEventListener('input', update));
+    toggle.addEventListener('click', () => {
+        restInEuro = !restInEuro;
+        update();
+        toggle.textContent = restInEuro ? "Превключи ресто на лв" : "Превключи ресто на €";
+    });
+
+    // PWA stuff - quick blob manifest
+    const blob = new Blob([`{
+        "name": "DualPay Calculator",
+        "short_name": "DualPay",
+        "icons": [{"src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgZmlsbD0iIzA3OTFhNCIvPjx0ZXh0IHg9IjE4IiB5PSI3MCIgZm9udC1mYW1pbHk9IkNvbWZvcnRhYSIgZm9udC1zaXplPSI1MCIgZmlsbD0id2hpdGUiIGlkPSJjb21ib2JvdCI+4YaK4YaI4YqVPC9tZXh0Pjwvc3ZnPg==", "sizes": "128x128", "type": "image/svg+xml"}],
+        "start_url": ".",
+        "display": "standalone",
+        "theme_color": "#0e9aa2",
+        "background_color": "#eff6ff"
+    }`], {type: 'application/manifest+json'});
+    const manifest = URL.createObjectURL(blob);
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifest;
+    document.head.append(link);
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register(URL.createObjectURL(new Blob([""], {type: 'application/javascript'})));
+    }
+
+    update();
+</script>
+</body>
+</html>
