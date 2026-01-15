@@ -1,126 +1,278 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <title>DualPay Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Montserrat&display=swap" rel="stylesheet">
-</head>
-<body class="bg-sky-50 font-montserrat text-gray-800 flex flex-col h-screen">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DualPay Calculator</title>
 
-<header class="bg-teal-600 text-white p-4 text-center shadow-lg">
-    <h1 class="text-xl font-comfortaa">DualPay Calculator</h1>
+<!-- Tailwind + Google Fonts -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+
+<meta name="theme-color" content="#7c3aed"/>
+
+<style>
+:root {
+--accent: #7c3aed; /* виолетово */
+--accent-dark: #5b21b6;
+--glass: rgba(255, 255, 255, 0.72);
+}
+
+body {
+font-family: 'Montserrat', system-ui, sans-serif;
+background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+min-height: 100dvh;
+background-attachment: fixed;
+overflow-x: hidden;
+}
+
+h1 {
+font-family: 'Comfortaa', cursive;
+}
+
+.glass {
+background: var(--glass);
+backdrop-filter: blur(16px);
+-webkit-backdrop-filter: blur(16px);
+border: 1px solid rgba(255,255,255,0.3);
+box-shadow: 0 8px 32px rgba(31,38,135,0.15);
+}
+
+.bg-pattern {
+position: fixed;
+inset: 0;
+pointer-events: none;
+background-image:
+repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 45deg, rgba(124,58,237,0.06) 45deg, rgba(124,58,237,0.06) 90deg);
+opacity: 0.4;
+animation: floatBg 40s linear infinite;
+z-index: -1;
+}
+
+@keyframes floatBg {
+0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+50% { transform: translate(4%, 3%) rotate(0.8deg) scale(1.02); }
+100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+.currency-symbol {
+font-family: 'Comfortaa', cursive;
+font-size: 1.1rem;
+font-weight: 700;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+</style>
+</head>
+<body class="relative">
+
+<div class="bg-pattern"></div>
+
+<!-- Главен контейнер -->
+<div class="min-h-dvh flex flex-col px-4 py-6 max-w-md mx-auto">
+
+<!-- Заглавие -->
+<header class="text-center mb-8">
+<div class="inline-block glass rounded-3xl px-8 py-4 shadow-xl transform hover:scale-105 transition-transform">
+<h1 class="text-3xl font-bold text-white drop-shadow-md tracking-wide">
+DualPay
+</h1>
+<p class="text-sm text-indigo-100 mt-1">€ ↔ лв ресто</p>
+</div>
 </header>
 
-<main class="flex-1 p-6 space-y-5">
-    <!-- amount to pay -->
-    <div>
-        <label class="block text-sm font-medium">Дължима сума:</label>
-        <div class="mt-1 flex rounded-lg overflow-hidden shadow">
-            <input type="number" step="0.01" id="amount" placeholder="0.00" class="w-full px-4 py-2 outline-none bg-white">
-            <select id="currency" class="bg-gray-100 px-4 py-2">
-                <option>лв</option>
-                <option>€</option>
-            </select>
-        </div>
-    </div>
+<!-- Основна форма -->
+<main class="glass rounded-3xl p-6 md:p-8 shadow-2xl flex-1 space-y-7">
 
-    <!-- payments -->
-    <div class="space-y-3">
-        <label>Платено в лв:</label>
-        <input type="number" step="0.01" id="paidBGN" placeholder="0.00" class="w-full p-3 rounded border">
-    </div>
+<!-- Дължима сума -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-indigo-900">Дължима сума</label>
+<div class="flex rounded-2xl overflow-hidden shadow-inner bg-white/80">
+<input
+type="number"
+step="0.01"
+min="0"
+id="amount"
+placeholder="0.00"
+class="flex-1 bg-transparent px-5 py-4 text-xl font-medium outline-none text-center"
+/>
+<select id="currency" class="bg-indigo-100/60 px-5 py-4 text-lg font-medium currency-symbol border-l border-indigo-200">
+<option value="BGN">лв</option>
+<option value="EUR">€</option>
+</select>
+</div>
+</div>
 
-    <div class="space-y-3">
-        <label>Платено в €:</label>
-        <input type="number" step="0.01" id="paidEUR" placeholder="0.00" class="w-full p-3 rounded border">
-    </div>
+<!-- Платено в лева -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-indigo-900">Платено в лева</label>
+<input
+type="number"
+step="0.01"
+min="0"
+id="paidBGN"
+placeholder="0.00"
+class="w-full rounded-2xl px-5 py-4 text-xl bg-white/80 shadow-inner outline-none text-center font-medium"
+/>
+</div>
 
-    <!-- result -->
-    <div id="result" class="mt-6 p-4 rounded-lg bg-white hidden shadow">
-        <div class="flex justify-between text-lg">
-            <span>Ресто:</span>
-            <span id="restAmount">—</span>
-        </div>
-        <div class="text-sm text-gray-500 mt-1" id="restCurrency">—</div>
-    </div>
+<!-- Платено в евро -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-indigo-900">Платено в евро</label>
+<input
+type="number"
+step="0.01"
+min="0"
+id="paidEUR"
+placeholder="0.00"
+class="w-full rounded-2xl px-5 py-4 text-xl bg-white/80 shadow-inner outline-none text-center font-medium"
+/>
+</div>
 
-    <div id="error" class="hidden text-red-600 text-center py-2 rounded font-bold animate-pulse">
-        Платено е недостатъчно!
-    </div>
+<!-- Резултат -->
+<div id="resultBlock" class="hidden mt-6 pt-6 border-t border-indigo-200/40">
+<div class="text-center">
+<div class="text-4xl font-bold text-indigo-800 mb-1" id="restValue">—</div>
+<div class="text-xl currency-symbol" id="restCurrency">—</div>
+<div class="text-sm text-indigo-600/80 mt-2" id="equivalent"></div>
+</div>
+</div>
 
-    <button id="toggle" class="mt-4 bg-teal-600 text-white px-6 py-2 rounded-full shadow hover:bg-teal-700">
-        Превключи ресто на лв
-    </button>
+<!-- Грешка -->
+<div id="error" class="hidden text-center text-red-600 font-medium py-3 bg-red-50/60 rounded-2xl">
+Недостатъчна сума!
+</div>
+
+<!-- Превключвател -->
+<button
+id="toggleRest"
+class="w-full mt-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-medium py-4 rounded-2xl shadow-lg active:scale-98 transition-all"
+>
+Ресто в евро ←→ лева
+</button>
+
 </main>
 
-<footer class="text-xs text-center p-3 text-gray-500 bg-white border-t">
-    Курс: 1 EUR = one point nine five five eight three BGN © Leo
+<!-- Футър с курса -->
+<footer class="text-center text-xs text-indigo-800/60 mt-8 pb-6">
+Фиксиран курс: 1 EUR = 1.95583 BGN<br>
+© 2026 Marina • DualPay Calculator
 </footer>
 
+</div>
+
+<!-- JavaScript логика -->
 <script>
-    const rate = 1.95583;
-    const toggle = document.getElementById("toggle");
-    const result = document.getElementById("result");
-    let restInEuro = true;
+const RATE = 1.95583;
+let restInEuro = true;
 
-    function update() {
-        const amount = parseFloat(document.getElementById("amount").value) || 0;
-        const currency = document.getElementById("currency").value;
-        const base = currency === "лв" ? amount : amount * rate;
+const amountEl = document.getElementById('amount');
+const currencyEl = document.getElementById('currency');
+const paidBGNEl = document.getElementById('paidBGN');
+const paidEUREl = document.getElementById('paidEUR');
+const resultBlock = document.getElementById('resultBlock');
+const restValue = document.getElementById('restValue');
+const restCurrency = document.getElementById('restCurrency');
+const equivalent = document.getElementById('equivalent');
+const error = document.getElementById('error');
+const toggleBtn = document.getElementById('toggleRest');
 
-        const paidBGN = parseFloat(document.getElementById("paidBGN").value) || 0;
-        const paidEUR = parseFloat(document.getElementById("paidEUR").value) || 0;
-        const totalPaid = paidBGN + paidEUR * rate;
+function calculate() {
+const amount = parseFloat(amountEl.value) || 0;
+const currency = currencyEl.value;
+const paidBGN = parseFloat(paidBGNEl.value) || 0;
+const paidEUR = parseFloat(paidEUREl.value) || 0;
 
-        const rest = totalPaid - base;
-        const error = document.getElementById("error");
+// Конвертираме дължимата сума в лева
+const dueBGN = currency === 'EUR' ? amount * RATE : amount;
 
-        if (rest < 0) {
-            error.classList.remove("hidden");
-            result.classList.add("hidden");
-            return;
-        }
-        error.classList.add("hidden");
+const totalPaidBGN = paidBGN + (paidEUR * RATE);
+const restBGN = totalPaidBGN - dueBGN;
 
-        const restDisplay = restInEuro ? rest / rate : rest;
-        document.getElementById("restAmount").textContent = restDisplay.toFixed(2);
-        document.getElementById("restCurrency").textContent = restInEuro ? 
-            `€ (${(rest).toFixed(2)} лв)` : 
-            `лв (${(rest / rate).toFixed(2)} €)`;
+if (restBGN < -0.001) { // малка толерантност за float
+error.classList.remove('hidden');
+resultBlock.classList.add('hidden');
+return;
+}
 
-        result.classList.remove("hidden");
-    }
+error.classList.add('hidden');
+resultBlock.classList.remove('hidden');
 
-    document.querySelectorAll('input').forEach(el => el.addEventListener('input', update));
-    toggle.addEventListener('click', () => {
-        restInEuro = !restInEuro;
-        update();
-        toggle.textContent = restInEuro ? "Превключи ресто на лв" : "Превключи ресто на €";
-    });
+let displayValue, displayUnit, eqText;
 
-    // PWA stuff - quick blob manifest
-    const blob = new Blob([`{
-        "name": "DualPay Calculator",
-        "short_name": "DualPay",
-        "icons": [{"src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgZmlsbD0iIzA3OTFhNCIvPjx0ZXh0IHg9IjE4IiB5PSI3MCIgZm9udC1mYW1pbHk9IkNvbWZvcnRhYSIgZm9udC1zaXplPSI1MCIgZmlsbD0id2hpdGUiIGlkPSJjb21ib2JvdCI+4YaK4YaI4YqVPC9tZXh0Pjwvc3ZnPg==", "sizes": "128x128", "type": "image/svg+xml"}],
-        "start_url": ".",
-        "display": "standalone",
-        "theme_color": "#0e9aa2",
-        "background_color": "#eff6ff"
-    }`], {type: 'application/manifest+json'});
-    const manifest = URL.createObjectURL(blob);
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = manifest;
-    document.head.append(link);
+if (restInEuro) {
+displayValue = (restBGN / RATE).toFixed(2);
+displayUnit = '€';
+eqText = `(${restBGN.toFixed(2)} лв)`;
+} else {
+displayValue = restBGN.toFixed(2);
+displayUnit = 'лв';
+eqText = `(${(restBGN / RATE).toFixed(2)} €)`;
+}
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register(URL.createObjectURL(new Blob([""], {type: 'application/javascript'})));
-    }
+restValue.textContent = displayValue;
+restCurrency.textContent = displayUnit;
+equivalent.textContent = eqText;
+}
 
-    update();
+// Слушатели
+[amountEl, currencyEl, paidBGNEl, paidEUREl].forEach(el => {
+el.addEventListener('input', calculate);
+});
+
+toggleBtn.addEventListener('click', () => {
+restInEuro = !restInEuro;
+toggleBtn.textContent = restInEuro
+? 'Ресто в евро ←→ лева'
+: 'Ресто в лева ←→ евро';
+calculate();
+});
+
+// Първоначално изчисление
+calculate();
+
+
+// =======================================
+// PWA – manifest & service worker
+// =======================================
+
+// Динамичен manifest
+const manifest = {
+"name": "DualPay Calculator",
+"short_name": "DualPay",
+"description": "Лесно изчисляване на ресто при прехода евро-лева",
+"start_url": ".",
+"display": "standalone",
+"background_color": "#f3e8ff",
+"theme_color": "#7c3aed",
+"icons": [
+{
+"src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%237c3aed'/%3E%3Ctext x='50' y='65' font-family='Comfortaa' font-size='60' text-anchor='middle' fill='white'%3E%E2%82%AC%E2%82%B4%3C/text%3E%3C/svg%3E",
+"sizes": "192x192",
+"type": "image/svg+xml"
+}
+]
+};
+
+const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = manifestURL;
+document.head.appendChild(link);
+
+// Минимум service worker (за да се счита за PWA)
+if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register(URL.createObjectURL(new Blob([""], {type: 'application/javascript'})))
+.catch(() => console.log("SW регистрация неуспешна (очаквано в някои среди)"));
+}
 </script>
 </body>
 </html>
